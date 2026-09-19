@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الشرح التفاعلي للكمبيوتر الكمومي ⚛️</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap');
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+        }
+        .quantum-glow {
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.25);
+        }
+        .quantum-glow-purple {
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.25);
+        }
+        @keyframes spin-slow {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.05); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+        .animate-quantum {
+            animation: spin-slow 8s infinite linear;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.08); }
+        }
+        .pulse-particle {
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-slate-900">
+
+    <!-- Header Navigation -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-500 flex items-center justify-center text-xl shadow-lg shadow-cyan-500/30">
+                    ⚛️
+                </div>
+                <div>
+                    <h1 class="font-bold text-xl bg-gradient-to-r from-cyan-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">
+                        مستكشف الكمبيوتر الكمومي
+                    </h1>
+                    <p class="text-xs text-slate-400">دليل تفاعلي للجيل القادم من الحوسبة</p>
+                </div>
+            </div>
+            
+            <nav class="flex flex-wrap gap-2 text-sm">
+                <button onclick="switchTab('lab')" id="tab-lab" class="tab-btn px-4 py-2 rounded-lg bg-cyan-600 text-white font-medium transition duration-200">
+                    🧪 المختبر التفاعلي
+                </button>
+                <button onclick="switchTab('path1')" id="tab-path1" class="tab-btn px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium transition duration-200">
+                    🌀 1. كيف يعمل الكيوبت؟
+                </button>
+                <button onclick="switchTab('path2')" id="tab-path2" class="tab-btn px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium transition duration-200">
+                    🚀 2. مقارنة التطبيقات
+                </button>
+                <button onclick="switchTab('path3')" id="tab-path3" class="tab-btn px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium transition duration-200">
+                    ❄️ 3. التحديات والمستقبل
+                </button>
+                <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium transition duration-200">
+                    🧩 اختبر معلوماتك
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
+
+        <!-- INTRO HERO BANNER -->
+        <div class="mb-10 p-6 md:p-8 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950/60 to-slate-900 border border-slate-800 relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 w-60 h-60 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -left-10 -bottom-10 w-60 h-60 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="relative z-10 max-w-3xl">
+                <span class="px-3 py-1 text-xs rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/50 mb-3 inline-block font-semibold">
+                    مرحباً بك في عالم الكوانتم!
+                </span>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-white mb-3">
+                    رحلة في أعماق الفيزياء الحسابية
+                </h2>
+                <p class="text-slate-300 text-sm md:text-base leading-relaxed">
+                    بينما يعتمد حاسوبك الحالي على البتات التقليدية (0 أو 1)، يفتح الحوسبة الكمومية أبواباً جديدة عبر البت الكمومي (<span class="text-cyan-400 font-mono">Qubit</span>). تنقل عبر الأقسام أدناه لتجرّب محاكاة الظواهر الكمومية بنفسك، وتكتشف قوة التراكب والتشابك!
+                </p>
+            </div>
+        </div>
+
+        <!-- SECTION 0: INTERACTIVE LAB (DEFAULT ACTIVE) -->
+        <div id="section-lab" class="tab-content block space-y-8">
+            
+            <div class="text-center max-w-2xl mx-auto mb-6">
+                <h3 class="text-2xl font-bold text-white mb-2">🧪 مختبر الفيزياء الكمومية</h3>
+                <p class="text-slate-400 text-sm">قم بتجربة الظواهر الأساسية بنفسك واشعر بالفرق الحقيقي بين العالم التقليدي والعالم الكمومي.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                <!-- Simulator 1: Superposition -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between quantum-glow">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-bold text-lg text-cyan-400 flex items-center gap-2">
+                                <i class="fa-solid font-bold fa-atom"></i> 1. محاكاة التراكب (Superposition)
+                            </h4>
+                            <span class="text-xs px-2 py-1 rounded bg-slate-800 text-slate-400 font-mono">Qubit #1</span>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-6">
+                            العملة المعدنية المتوقفة إما وجه (<span class="text-cyan-400 font-bold">1</span>) أو ظهر (<span class="text-purple-400 font-bold">0</span>). لكن عندما تدور العملة بسرعة، فهي في حالة "تراكب" تجمع الحالتين معاً! لا تتحدد قيمتها إلا لحظة **القياس** (إيقاف العملة).
+                        </p>
+
+                        <!-- Visual Qubit State Box -->
+                        <div class="bg-slate-950 rounded-xl p-6 border border-slate-800 flex flex-col items-center justify-center relative min-h-[220px]">
+                            <!-- Animated Qubit Center -->
+                            <div id="qubit-visual" class="w-28 h-28 rounded-full border-4 border-dashed border-cyan-400 flex items-center justify-center text-2xl font-extrabold text-cyan-300 transition-all duration-500 animate-quantum relative shadow-lg shadow-cyan-500/20">
+                                <span id="qubit-state-text" class="font-mono">|Ψ⟩</span>
+                            </div>
+
+                            <!-- State Equation Display -->
+                            <div class="mt-6 text-center font-mono text-sm bg-slate-900/80 px-4 py-2 rounded-lg border border-slate-800">
+                                |Ψ⟩ = <span id="prob-0-text" class="text-purple-400">0.71</span>|0⟩ + <span id="prob-1-text" class="text-cyan-400">0.71</span>|1⟩
+                            </div>
+                        </div>
+
+                        <!-- Controls -->
+                        <div class="mt-6 space-y-4">
+                            <div>
+                                <div class="flex justify-between text-xs text-slate-400 mb-1">
+                                    <span>احتمالية |0⟩: <span id="p0-val">50%</span></span>
+                                    <span>احتمالية |1⟩: <span id="p1-val">50%</span></span>
+                                </div>
+                                <input type="range" id="superposition-slider" min="0" max="100" value="50" oninput="updateSuperpositionSlider(this.value)" class="w-full accent-cyan-400 cursor-pointer">
+                            </div>
+
+                            <div class="flex gap-3">
+                                <button onclick="measureQubit()" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-sm transition shadow-lg shadow-cyan-500/20">
+                                    <i class="fa-solid fa-eye mr-1"></i> إجراء قياس (Measure)
+                                </button>
+                                <button onclick="resetQubit()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition">
+                                    إعادة التراكب
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="qubit-result-msg" class="mt-4 p-3 rounded-lg bg-slate-950/60 border border-slate-800 text-xs text-slate-400 text-center min-h-[42px] flex items-center justify-center">
+                        الكيوبت حالياً في حالة تراكب كمومي. اضغط "إجراء قياس" لتدمير التراكب ومعرفة النتيجة.
+                    </div>
+                </div>
+
+                <!-- Simulator 2: Entanglement -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between quantum-glow-purple">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-bold text-lg text-purple-400 flex items-center gap-2">
+                                <i class="fa-solid fa-link"></i> 2. محاكاة التشابك الكمومي (Entanglement)
+                            </h4>
+                            <span class="text-xs px-2 py-1 rounded bg-slate-800 text-slate-400 font-mono">Entangled Pair</span>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-6">
+                            عندما يتشابك كيوبتان، يرتبطان ببعضهما بشكل مطلق. بمجرد قياس الكيوبت الأول، تتحدد حالة الكيوبت الثاني **لحظياً** وبشكل فوري بغض النظر عن المسافة بينهما!
+                        </p>
+
+                        <!-- Visual Entangled Pair -->
+                        <div class="bg-slate-950 rounded-xl p-6 border border-slate-800 flex items-center justify-around relative min-h-[220px]">
+                            <!-- Connection Beam -->
+                            <div id="entangle-beam" class="absolute h-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-indigo-500 w-1/2 rounded-full blur-[1px] animate-pulse"></div>
+
+                            <!-- Qubit A -->
+                            <div class="flex flex-col items-center gap-2 z-10">
+                                <span class="text-xs text-cyan-400 font-bold">الكيوبت (أ) - الأرض</span>
+                                <div id="qubit-a-box" class="w-20 h-20 rounded-full border-2 border-cyan-400 bg-slate-900 flex items-center justify-center text-lg font-mono font-bold text-cyan-300 shadow-md">
+                                    |?⟩
+                                </div>
+                            </div>
+
+                            <!-- Qubit B -->
+                            <div class="flex flex-col items-center gap-2 z-10">
+                                <span class="text-xs text-purple-400 font-bold">الكيوبت (ب) - المريخ</span>
+                                <div id="qubit-b-box" class="w-20 h-20 rounded-full border-2 border-purple-400 bg-slate-900 flex items-center justify-center text-lg font-mono font-bold text-purple-300 shadow-md">
+                                    |?⟩
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="mt-6 flex gap-3">
+                            <button onclick="measureEntangled('A')" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-sm transition shadow-lg shadow-purple-500/20">
+                                قياس الكيوبت (أ) فقط
+                            </button>
+                            <button onclick="resetEntanglement()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition">
+                                إعادة التشابك
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="entangle-result-msg" class="mt-4 p-3 rounded-lg bg-slate-950/60 border border-slate-800 text-xs text-slate-400 text-center min-h-[42px] flex items-center justify-center">
+                        الكيوبتان في حالة تشابك كمومي تام. قياس أحدهما سينعكس فوراً على الآخر!
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Simulator 3: Quantum Speedup Calculator -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h4 class="font-bold text-lg text-emerald-400 flex items-center gap-2">
+                        <i class="fa-solid fa-bolt"></i> 3. حاسبة النمو الأسري للقدرة الحسابية ($2^N$)
+                    </h4>
+                    <span class="text-xs px-2 py-1 rounded bg-slate-800 text-emerald-400 font-mono">Quantum Exponential Power</span>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed mb-6">
+                    بينما يعالج الحاسوب التقليدي حالة واحدة من أصل $2^N$ حالة في كل خطوة، يستطيع الحاسوب الكمومي معالجة **جميع الحالات الـ $2^N$ في نفس الوقت بالتوازي** بفضل التراكب!
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                    <div class="space-y-4">
+                        <label class="block text-xs font-medium text-slate-400">اختر عدد الكيوبتات ($N$):</label>
+                        <div class="flex items-center gap-3">
+                            <input type="range" id="qubit-count-slider" min="1" max="60" value="10" oninput="calculateQuantumPower(this.value)" class="w-full accent-emerald-400 cursor-pointer">
+                            <span id="qubit-count-display" class="font-mono text-xl font-bold text-emerald-400 w-12 text-center">10</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400">حرك الشريط لمشاهدة الانفجار الأسري لقوة الحوسبة!</p>
+                    </div>
+
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+                        <span class="text-xs text-slate-400 block mb-1">عدد الحالات المعالجة بالتوازي</span>
+                        <span id="quantum-states-display" class="text-xl md:text-2xl font-extrabold font-mono text-emerald-400 break-all">1,024</span>
+                        <span class="text-[10px] text-slate-400 block mt-1">حالة مختلفة في وقت واحد!</span>
+                    </div>
+
+                    <div id="quantum-comparison-card" class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs space-y-2">
+                        <div class="text-slate-300 font-bold mb-1 border-b border-slate-800 pb-1">مقارنة بالحواسيب التقليدية:</div>
+                        <p id="quantum-analogy-text" class="text-slate-400 leading-relaxed">
+                            10 بتات كمومية تعادل معالجة 1,024 حالة تقليدية بالتوازي. هذا يسهل حسابه على أي هاتف ذكي.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- SECTION 1: HOW QUBITS WORK -->
+        <div id="section-path1" class="tab-content hidden space-y-8">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-2xl font-bold border border-cyan-500/20">
+                        🌀
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-white">1️⃣ كيف يعمل الكيوبت؟ (المبادئ الفيزيائية)</h3>
+                        <p class="text-xs text-slate-400">فهم التراكب، التشابك، والتداخل الكمومي على المستوى الذري</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-slate-300 text-sm leading-relaxed">
+                    
+                    <div class="bg-slate-950 p-6 rounded-xl border border-slate-800/80 space-y-3">
+                        <h4 class="font-bold text-cyan-400 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-coins"></i> البت التقليدي vs البت الكمومي (Qubit)
+                        </h4>
+                        <p>
+                            في حاسوبك الذي تقرأ منه الآن، البت التقليدي ينشأ بواسطة مفاتيح ترانزستور بسيطة: إما أن يعبر التيار الكهربائي (<span class="font-mono text-cyan-400">1</span>) أو لا يعبر (<span class="font-mono text-purple-400">0</span>).
+                        </p>
+                        <p>
+                            أما الكيوبت، فيُصنع من جسيمات تحت ذرية مثل **الإلكترونات** (باستخدام اتجاه غزلها Spin) أو **الفوتونات** (باستخدام استقطاب الضوء Polarization). هذه الجسيمات تخضع لقوانين فيزياء الكم العجيبة.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-950 p-6 rounded-xl border border-slate-800/80 space-y-3">
+                        <h4 class="font-bold text-cyan-400 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-globe"></i> التراكب الكمومي (Superposition)
+                        </h4>
+                        <p>
+                            تسمح ميكانيكا الكم للجسيم بأن يكون في مزيج خطي من الحالات. نُعبّر عن حالة الكيوبت الرياضية بالمعادلة:
+                        </p>
+                        <div class="bg-slate-900 p-3 rounded-lg text-center font-mono text-cyan-300 border border-slate-800">
+                            |Ψ⟩ = α|0⟩ + β|1⟩
+                        </div>
+                        <p class="text-xs text-slate-400">
+                            حيث $|\alpha|^2$ هي احتمال قياس الصفر، و $|\beta|^2$ هي احتمال قياس الواحد. طالما لم نقم بقياس الجسيم، فهو يستكشف جميع الاحتمالات معاً!
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-950 p-6 rounded-xl border border-slate-800/80 space-y-3">
+                        <h4 class="font-bold text-purple-400 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-link"></i> التشابك الكمومي (Entanglement)
+                        </h4>
+                        <p>
+                            وصفها ألبرت أينشتاين بـ *"الفعل الشبحي عن بُعد"* (Spooky action at a distance). عندما يتشابك جسيمان كموميان، تصبح حالتاهما مرتبطتين بقوة لدرجة أن قياس أحدهما يحدد حالة الآخر فورياً، حتى لو كان أحدهما على الأرض والآخر في مجرة أخرى!
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-950 p-6 rounded-xl border border-slate-800/80 space-y-3">
+                        <h4 class="font-bold text-emerald-400 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-wave-square"></i> التداخل الكمومي (Quantum Interference)
+                        </h4>
+                        <p>
+                            مثل أمواج الماء، يمكن للموجات الكمومية أن تتداخل **تداخلاً بنّاءً** (لتقوية الإجابات الصحيحة والتصحيح) أو **تداخلاً هداماً** (لإلغاء الإجابات الخاطئة). هكذا تتوصل الخوارزميات الكمومية للحل الصحيح بسرعة خيالية!
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: APPLICATIONS & COMPARISON -->
+        <div id="section-path2" class="tab-content hidden space-y-8">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-2xl font-bold border border-purple-500/20">
+                        🚀
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-white">2️⃣ مقارنة التطبيقات (ما الذي يستطيعه الحاسوب الكمومي؟)</h3>
+                        <p class="text-xs text-slate-400">مجالات الاستخدام الثورية مقارنة بالحواسيب الفائقة</p>
+                    </div>
+                </div>
+
+                <!-- Comparison Table -->
+                <div class="overflow-x-auto mb-8">
+                    <table class="w-full text-sm text-right text-slate-300 border border-slate-800 rounded-xl overflow-hidden">
+                        <thead class="bg-slate-950 text-slate-200 text-xs font-bold uppercase">
+                            <tr>
+                                <th class="p-4 border-b border-slate-800">وجه المقارنة</th>
+                                <th class="p-4 border-b border-slate-800 text-cyan-400">الحاسوب التقليدي / الفائق 💻</th>
+                                <th class="p-4 border-b border-slate-800 text-purple-400">الحاسوب الكمومي ⚛️</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60 bg-slate-900/50">
+                            <tr>
+                                <td class="p-4 font-semibold text-white">وحدة البناء الأساسية</td>
+                                <td class="p-4">بت تقليدي (Bits: 0 أو 1)</td>
+                                <td class="p-4 text-purple-300 font-semibold">كيوبت كمومي (Qubit: 0 و 1 معاً)</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-semibold text-white">نمط معالجة البيانات</td>
+                                <td class="p-4">تسلسلي / بالتوازي المحدود (Sequentially)</td>
+                                <td class="p-4 text-purple-300 font-semibold">توازي كمومي ضخم أسّي ($2^N$)</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-semibold text-white">الأداء في المهام اليومية</td>
+                                <td class="p-4 text-emerald-400">ممتاز جداً (تصفح، ألعاب، فيديو)</td>
+                                <td class="p-4 text-rose-400">غير مناسب إطلاقاً للمهام العادية</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-semibold text-white">المشكلات المعقدة الضخمة</td>
+                                <td class="p-4 text-rose-400">قد يستغرق آلاف السنين لحلها</td>
+                                <td class="p-4 text-emerald-400 font-semibold">يحالها في ثوانٍ أو دقائق معدودة!</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Use Cases Grid -->
+                <h4 class="font-bold text-lg text-white mb-4">أبرز المجالات التي سيغير فيها الحاسوب الكمومي العالم:</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-2">
+                        <div class="text-cyan-400 text-2xl"><i class="fa-solid fa-vial-virus"></i></div>
+                        <h5 class="font-bold text-white text-base">1. تطوير الأدوية واللقاحات</h5>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            محاكاة التفاعلات الجزيئية المعقدة والبروتينات تتطلب قدرات حسابية تفوق الحواسيب الحالية. الكمبيوتر الكمومي يستطيع محاكاة الجزيئات الكيميائية بدقة ذرية، مما يقلل وقت اكتشاف الأدوية من 10 سنوات إلى أيام!
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-2">
+                        <div class="text-purple-400 text-2xl"><i class="fa-solid fa-user-shield"></i></div>
+                        <h5 class="font-bold text-white text-base">2. التشفير والأمن السيبراني</h5>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            تعتمد أنظمة التشفير العالمية الحالية (مثل RSA) على صعوبة تحليل الأعداد الأولية الكبيرة. خوارزمية **شور (Shor's Algorithm)** الكمومية تستطيع كسر هذه الشفرات بثوانٍ، مما يدفع العلماء لابتكار "التشفير ما بعد الكم".
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-2">
+                        <div class="text-emerald-400 text-2xl"><i class="fa-solid fa-brain"></i></div>
+                        <h5 class="font-bold text-white text-base">3. الذكاء الاصطناعي وتحسين اللوجستيات</h5>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            تدريب نماذج الذكاء الاصطناعي الضخمة وتحديث ملايين الخوارزميات في سلاسل التوريد، الطيران، والتنبؤ بالطقس والمناخ بدقة متناهية عبر معالجة كميات هائلة من الاحتمالات بالتوازي.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: CHALLENGES & FUTURE -->
+        <div id="section-path3" class="tab-content hidden space-y-8">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-2xl font-bold border border-indigo-500/20">
+                        ❄️
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-white">3️⃣ التحديات الحالية والمستقبل</h3>
+                        <p class="text-xs text-slate-400">لماذا لا يملك الجميع حاسوباً كمومياً في منزله؟</p>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                            <span class="text-xs font-bold text-rose-400 bg-rose-950 px-2.5 py-1 rounded-full border border-rose-800/50">تحدي #1</span>
+                            <h4 class="font-bold text-white">فقدان الترابط (Decoherence)</h4>
+                            <p class="text-xs text-slate-400 leading-relaxed">
+                                حالات التراكب والتشابك هشّة للغاية! أي اهتزاز حراري بسيط أو إشعاع كهرومغناطيسي قد يجعل الكيوبت يفقد حالته الكمومية ويهوي إلى بت تقليدي عالي الأخطاء.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                            <span class="text-xs font-bold text-cyan-400 bg-cyan-950 px-2.5 py-1 rounded-full border border-cyan-800/50">تحدي #2</span>
+                            <h4 class="font-bold text-white">التبريد الفائق (Cryogenics)</h4>
+                            <p class="text-xs text-slate-400 leading-relaxed">
+                                تتطلب معظم المعالجات الكمومية (مثل أجهزة IBM وGoogle) درجات حرارة قريبة جداً من **الصفر المطلق** (حوالي <span class="font-mono text-cyan-300">-273°C</span> أو 15 millikelvin)، وهو أبرد من الفضاء الخارجي!
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                            <span class="text-xs font-bold text-purple-400 bg-purple-950 px-2.5 py-1 rounded-full border border-purple-800/50">تحدي #3</span>
+                            <h4 class="font-bold text-white">تصحيح الأخطاء الكمومية</h4>
+                            <p class="text-xs text-slate-400 leading-relaxed">
+                                لبناء كيوبت منطقي واحِد مستقر وخالٍ من الأخطاء، قد نحتاج إلى مئات أو آلاف الكيوبتات المادية المساعدة للحماية والتصحيح.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <!-- Future Status Box -->
+                    <div class="bg-gradient-to-r from-slate-950 via-indigo-950/40 to-slate-950 p-6 rounded-xl border border-slate-800">
+                        <h4 class="font-bold text-base text-cyan-300 mb-2">أين وصل العلماء والشركات اليوم؟</h4>
+                        <ul class="text-xs md:text-sm text-slate-300 space-y-2 list-disc list-inside leading-relaxed">
+                            <li>حققت شركات مثل **Google** و **IBM** مفهوم "التفوق الكمومي" (Quantum Supremacy) بإنجاز حسابات في دقائق تستغرق من أفضل حاسوب فائق آلاف السنين.</li>
+                            <li>تم الانتقال من أجهزة تحتوي على 50 كيوبت إلى معالجات تتجاوز **1,000 كيوبت** (مثل معالج IBM Condor).</li>
+                            <li>**الهدف المستقبلي:** الوصول إلى أجهزة تحتوي على 1,000,000 كيوبت مادي مع تصحيح أخطاء متكامل بحلول عام 2030-2035.</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 4: QUIZ -->
+        <div id="section-quiz" class="tab-content hidden space-y-8">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8 max-w-3xl mx-auto">
+                <div class="flex items-center justify-between mb-6 border-b border-slate-800 pb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl font-bold border border-emerald-500/20">
+                            🧩
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">اختبر فهمك لمفاهيم الحوسبة الكمومية</h3>
+                            <p class="text-xs text-slate-400">أجب على الأسئلة التالية لتتحقق من استيعابك للموضوع</p>
+                        </div>
+                    </div>
+                    <span id="quiz-score-badge" class="px-3 py-1 bg-slate-800 text-emerald-400 font-mono text-sm rounded-full font-bold">
+                        النتيجة: 0 / 3
+                    </span>
+                </div>
+
+                <!-- Quiz Questions -->
+                <div class="space-y-6" id="quiz-container">
+                    
+                    <!-- Question 1 -->
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                        <p class="text-sm font-semibold text-white">س1: ما الذي يميز "الكيوبت" عن "البت التقليدي"؟</p>
+                        <div class="space-y-2 text-xs">
+                            <button onclick="checkAnswer(this, 1, false)" class="quiz-opt w-full text-right p-3 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">
+                                أ) الكيوبت أسرع فقط لأنه يستخدم أسلاكاً ذهبية.
+                            </button>
+                            <button onclick="checkAnswer(this, 1, true)" class="quiz-opt w-full text-right p-3 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">
+                                ب) الكيوبت يمكن أن يكون في حالة 0 و 1 معاً في نفس الوقت (التراكب).
+                            </button>
+                            <button onclick="checkAnswer(this, 1, false)" class="quiz-opt w-full text-right p-3 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">
+                                ج) الكيوبت يمكنه تخزين الأرقام من 0 إلى 9 كحاسبة عادية.
+                            </button>
+                        </div>
+                        <div class="quiz-feedback hidden text-xs p-2.5 rounded-lg"></div>
+                    </div>
+
+                    <!-- Question 2 -->
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                        <p class="text-sm font-semibold text-white">س2: عند قياس كيوبت في حالة تراكب كمومي، ماذا يحدث؟</p>
+                        <div class="space-y-2 text-xs">
+                            <button onclick="checkAnswer(this, 2, false)" class="quiz-opt w-full text-right p-3 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">
+                                أ) يظل في حالة التراكب للأبد بدون تغيير.
+                            </button>
+                            <button onclick="checkAnswer(this, 2, true)" class="quiz-opt w-full text-right p-3 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">
+                                ب) تنهار الحالات الكمومية ويتحدد إما كـ 0 أو 1 بصورة نهائية.
+                            </button>
+                            <button onclick="checkAnswer(this, 2, false)" class="quiz-opt w-full text-right p-3 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">
+                                ج) ينفجر المعالج الكمومي فوراً.
+                            </button>
+                        </div>
+                        <div class="quiz-feedback hidden text-xs p-2.5 rounded-lg"></div>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                        <p class="text-sm font-semibold text-white">س3: لماذا نحتاج لتبريد معظم الحواسيب الكمومية لدرجات قريبة من الصفر المطلق؟</p>
+                        <div class="space-y-2 text-xs">
+                            <button onclick="checkAnswer(this, 3, true)" class="quiz-opt w-full text-right p-3 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">
+                                أ) لمنع التشويش والحرارة من إتلاف الحالة الكمومية الهشة (فقدان الترابط).
+                            </button>
+                            <button onclick="checkAnswer(this, 3, false)" class="quiz-opt w-full text-right p-3 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">
+                                ب) لأن الجسيمات الكمومية تحب الجليد فقط.
+                            </button>
+                            <button onclick="checkAnswer(this, 3, false)" class="quiz-opt w-full text-right p-3 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">
+                                ج) لتوفير استهلاك الكهرباء في المختبر.
+                            </button>
+                        </div>
+                        <div class="quiz-feedback hidden text-xs p-2.5 rounded-lg"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-950 py-6 text-center text-xs text-slate-500">
+        <p>الشرح التفاعلي للكمبيوتر الكمومي ⚛️ | صُمم لمساعدة الطلاب والباحثين على فهم مفاهيم الفيزياء والحوسبة الكمومية</p>
+    </footer>
+
+    <!-- Interactive Logic Script -->
+    <script>
+        // TAB SWITCHING SYSTEM
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('block'));
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-cyan-600', 'text-white');
+                btn.classList.add('bg-slate-800', 'text-slate-300');
+            });
+
+            const activeSection = document.getElementById('section-' + tabId);
+            if (activeSection) {
+                activeSection.classList.remove('hidden');
+                activeSection.classList.add('block');
+            }
+
+            const activeBtn = document.getElementById('tab-' + tabId);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-slate-800', 'text-slate-300');
+                activeBtn.classList.add('bg-cyan-600', 'text-white');
+            }
+        }
+
+        // SIMULATOR 1: SUPERPOSITION LOGIC
+        let p0_prob = 0.5;
+        let isMeasured = false;
+
+        function updateSuperpositionSlider(val) {
+            if (isMeasured) resetQubit();
+            const p1_percent = parseInt(val);
+            const p0_percent = 100 - p1_percent;
+            
+            p0_prob = p0_percent / 100;
+            
+            document.getElementById('p0-val').innerText = p0_percent + '%';
+            document.getElementById('p1-val').innerText = p1_percent + '%';
+
+            const alpha = Math.sqrt(p0_prob).toFixed(2);
+            const beta = Math.sqrt(1 - p0_prob).toFixed(2);
+
+            document.getElementById('prob-0-text').innerText = alpha;
+            document.getElementById('prob-1-text').innerText = beta;
+        }
+
+        function measureQubit() {
+            const visual = document.getElementById('qubit-visual');
+            const stateText = document.getElementById('qubit-state-text');
+            const msg = document.getElementById('qubit-result-msg');
+
+            visual.classList.remove('animate-quantum');
+
+            const rand = Math.random();
+            let outcome = 0;
+            if (rand < p0_prob) {
+                outcome = 0;
+                visual.className = "w-28 h-28 rounded-full border-4 border-purple-500 bg-purple-950/60 flex items-center justify-center text-3xl font-extrabold text-purple-400 transition-all duration-300 shadow-lg shadow-purple-500/30";
+                stateText.innerText = "|0⟩";
+            } else {
+                outcome = 1;
+                visual.className = "w-28 h-28 rounded-full border-4 border-cyan-400 bg-cyan-950/60 flex items-center justify-center text-3xl font-extrabold text-cyan-300 transition-all duration-300 shadow-lg shadow-cyan-500/30";
+                stateText.innerText = "|1⟩";
+            }
+
+            isMeasured = true;
+            msg.innerHTML = `<span class="text-emerald-400 font-bold">تم القياس!</span> انهار التراكب الكمومي واستقرت النتيجة على الحالة <span class="font-mono text-cyan-300 text-sm">|${outcome}⟩</span>.`;
+        }
+
+        function resetQubit() {
+            const visual = document.getElementById('qubit-visual');
+            const stateText = document.getElementById('qubit-state-text');
+            const msg = document.getElementById('qubit-result-msg');
+
+            visual.className = "w-28 h-28 rounded-full border-4 border-dashed border-cyan-400 flex items-center justify-center text-2xl font-extrabold text-cyan-300 transition-all duration-500 animate-quantum relative shadow-lg shadow-cyan-500/20";
+            stateText.innerText = "|Ψ⟩";
+            isMeasured = false;
+            msg.innerText = "الكيوبت حالياً في حالة تراكب كمومي. اضغط \"إجراء قياس\" لتدمير التراكب ومعرفة النتيجة.";
+        }
+
+        // SIMULATOR 2: ENTANGLEMENT LOGIC
+        let isEntangledMeasured = false;
+
+        function measureEntangled(qubitTarget) {
+            if (isEntangledMeasured) return;
+
+            const boxA = document.getElementById('qubit-a-box');
+            const boxB = document.getElementById('qubit-b-box');
+            const msg = document.getElementById('qubit-result-msg');
+            const entangleMsg = document.getElementById('entangle-result-msg');
+
+            const randomState = Math.random() < 0.5 ? 0 : 1;
+            const stateStr = `|${randomState}⟩`;
+
+            const activeColor = randomState === 0 ? 'purple' : 'cyan';
+
+            boxA.className = `w-20 h-20 rounded-full border-2 border-${activeColor}-400 bg-${activeColor}-950/80 flex items-center justify-center text-xl font-mono font-bold text-${activeColor}-300 shadow-lg transition-all duration-300`;
+            boxA.innerText = stateStr;
+
+            boxB.className = `w-20 h-20 rounded-full border-2 border-${activeColor}-400 bg-${activeColor}-950/80 flex items-center justify-center text-xl font-mono font-bold text-${activeColor}-300 shadow-lg transition-all duration-300`;
+            boxB.innerText = stateStr;
+
+            isEntangledMeasured = true;
+            entangleMsg.innerHTML = `<span class="text-purple-400 font-bold">تأثير كمومي فوري!</span> بمجرد قياس الكيوبت (أ) ووجوده في الحالة <span class="font-mono text-cyan-300">${stateStr}</span>، تحول الكيوبت (ب) على المريخ فوراً إلى الحالة <span class="font-mono text-cyan-300">${stateStr}</span>!`;
+        }
+
+        function resetEntanglement() {
+            const boxA = document.getElementById('qubit-a-box');
+            const boxB = document.getElementById('qubit-b-box');
+            const entangleMsg = document.getElementById('entangle-result-msg');
+
+            boxA.className = "w-20 h-20 rounded-full border-2 border-cyan-400 bg-slate-900 flex items-center justify-center text-lg font-mono font-bold text-cyan-300 shadow-md";
+            boxA.innerText = "|?⟩";
+
+            boxB.className = "w-20 h-20 rounded-full border-2 border-purple-400 bg-slate-900 flex items-center justify-center text-lg font-mono font-bold text-purple-300 shadow-md";
+            boxB.innerText = "|?⟩";
+
+            isEntangledMeasured = false;
+            entangleMsg.innerText = "الكيوبتان في حالة تشابك كمومي تام. قياس أحدهما سينعكس فوراً على الآخر!";
+        }
+
+        // SIMULATOR 3: EXPONENTIAL CALCULATOR LOGIC
+        function calculateQuantumPower(val) {
+            const n = parseInt(val);
+            document.getElementById('qubit-count-display').innerText = n;
+
+            // 2^n
+            const states = Math.pow(2, n);
+            let formattedStates = "";
+            let analogy = "";
+
+            if (n <= 30) {
+                formattedStates = states.toLocaleString('ar-EG');
+            } else {
+                formattedStates = states.toExponential(4);
+            }
+
+            document.getElementById('quantum-states-display').innerText = formattedStates;
+
+            if (n < 15) {
+                analogy = `${n} كيوبت تعادل معالجة ${Math.pow(2, n).toLocaleString('ar-EG')} حالة بالتوازي. قدرة بسيطة تناسب الأجهزة العادية.`;
+            } else if (n <= 30) {
+                analogy = `${n} كيوبت تعالج أكثر من ${Math.floor(states/1e6)} مليون حالة في نفس الوقت! هذا يتجاوز قدرة حواسيب الجيب.`;
+            } else if (n <= 50) {
+                analogy = `${n} كيوبت تعالج أكثر من ${states.toExponential(2)} حالة! حاسوب فائق يحتاج زتا بايت من الذاكرة العشوائية لتخزين هذه الحالات!`;
+            } else {
+                analogy = `${n} كيوبت تعالج ${states.toExponential(2)} حالة بالتوازي! هذا الرقم يتجاوز عدد حبيبات الرمل على كوكب الأرض أو ذرات الكون المعروف!`;
+            }
+
+            document.getElementById('quantum-analogy-text').innerText = analogy;
+        }
+
+        // QUIZ SYSTEM LOGIC
+        let score = 0;
+        let answeredQuestions = new Set();
+
+        function checkAnswer(buttonEl, qNum, isCorrect) {
+            if (answeredQuestions.has(qNum)) return;
+
+            const parentDiv = buttonEl.closest('.bg-slate-950');
+            const feedbackDiv = parentDiv.querySelector('.quiz-feedback');
+            const allOpts = parentDiv.querySelectorAll('.quiz-opt');
+
+            allOpts.forEach(opt => opt.disabled = true);
+
+            if (isCorrect) {
+                buttonEl.classList.remove('bg-slate-900');
+                buttonEl.classList.add('bg-emerald-950', 'border-emerald-500', 'text-emerald-300');
+                feedbackDiv.classList.remove('hidden');
+                feedbackDiv.classList.add('bg-emerald-950/80', 'text-emerald-300', 'border', 'border-emerald-800');
+                feedbackDiv.innerText = "إجابة صحيحة! أحسنت 🎯";
+                score++;
+            } else {
+                buttonEl.classList.remove('bg-slate-900');
+                buttonEl.classList.add('bg-rose-950', 'border-rose-500', 'text-rose-300');
+                feedbackDiv.classList.remove('hidden');
+                feedbackDiv.classList.add('bg-rose-950/80', 'text-rose-300', 'border', 'border-rose-800');
+                feedbackDiv.innerText = "إجابة خاطئة. راجع الشرح في قسم المبادئ الفيزيائية ثم حاول مجدداً.";
+            }
+
+            answeredQuestions.add(qNum);
+            document.getElementById('quiz-score-badge').innerText = `النتيجة: ${score} / 3`;
+        }
+
+        // Initialize default view
+        calculateQuantumPower(10);
+    </script>
+</body>
+</html>
