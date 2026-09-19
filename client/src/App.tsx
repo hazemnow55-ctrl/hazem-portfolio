@@ -15,8 +15,8 @@ function Router() {
       <Route path={"/hazem-portfolio"} component={Home} />
       <Route path={"/hazem-portfolio/"} component={Home} />
       <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
-      <Route component={NotFound} />
+      {/* GitHub Pages can normalize the repository path differently. */}
+      <Route component={Home} />
     </Switch>
   );
 }
