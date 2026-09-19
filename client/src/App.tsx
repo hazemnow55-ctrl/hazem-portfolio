@@ -11,6 +11,9 @@ function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      {/* GitHub Pages serves this app from the repository subpath. */}
+      <Route path={"/hazem-portfolio"} component={Home} />
+      <Route path={"/hazem-portfolio/"} component={Home} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
