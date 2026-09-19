@@ -1,0 +1,1238 @@
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>طرنيب - لعبة الورق</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+  html, body { height: 100%; overflow: hidden; font-family: 'Cairo', sans-serif; }
+  body {
+    background:
+      radial-gradient(ellipse at 50% 0%, #1a4d2e 0%, #0a2818 60%, #051a0e 100%);
+    color: #f4e4bc;
+    position: relative;
+  }
+
+  /* Felt table texture */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(255,215,0,0.04) 0%, transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(255,215,0,0.04) 0%, transparent 40%),
+      repeating-radial-gradient(circle at 50% 50%, transparent 0, rgba(0,0,0,0.15) 2px, transparent 4px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #app {
+    position: relative;
+    width: 100vw; height: 100vh;
+    display: flex; flex-direction: column;
+    z-index: 1;
+  }
+
+  /* ===== Top Bar ===== */
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 16px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.5), rgba(0,0,0,0.1));
+    border-bottom: 1px solid rgba(255,215,0,0.2);
+    flex-shrink: 0;
+  }
+  .team-scores { display: flex; gap: 24px; }
+  .team {
+    text-align: center;
+    padding: 4px 16px;
+    border-radius: 10px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,215,0,0.25);
+  }
+  .team.us { border-color: rgba(100,200,255,0.5); }
+  .team.them { border-color: rgba(255,120,120,0.5); }
+  .team-name { font-size: 11px; opacity: 0.8; font-weight: 600; letter-spacing: 1px; }
+  .team-score { font-size: 22px; font-weight: 900; font-family: 'Amiri'; }
+  .team.us .team-score { color: #7ec5ff; }
+  .team.them .team-score { color: #ff9090; }
+
+  .game-info {
+    text-align: center;
+    flex: 1;
+  }
+  .info-label { font-size: 10px; opacity: 0.6; letter-spacing: 2px; }
+  .info-value { font-size: 16px; font-weight: 700; color: #ffd700; }
+  .trump-display {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    background: rgba(255,215,0,0.1);
+    border: 1px solid rgba(255,215,0,0.3);
+    margin-top: 2px;
+  }
+  .trump-icon { width: 18px; height: 18px; }
+
+  /* ===== Table Layout ===== */
+  .table {
+    flex: 1;
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-rows: 1fr 1.4fr 1fr;
+    grid-template-areas:
+      ". north ."
+      "west center east"
+      ". south south";
+    padding: 8px;
+    gap: 4px;
+  }
+
+  .seat {
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .seat-north { grid-area: north; }
+  .seat-east { grid-area: east; flex-direction: column; }
+  .seat-west { grid-area: west; flex-direction: column; }
+  .seat-south { grid-area: south; flex-direction: column; }
+  .center { grid-area: center; position: relative; }
+
+  .player-card {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, rgba(0,0,0,0.6), rgba(0,0,0,0.3));
+    border-radius: 30px;
+    border: 1px solid rgba(255,215,0,0.2);
+    transition: all 0.3s;
+  }
+  .player-card.active {
+    border-color: #ffd700;
+    box-shadow: 0 0 20px rgba(255,215,0,0.5);
+    background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,215,0,0.05));
+  }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, #8b6914, #d4a017);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; color: #1a1a1a; font-size: 16px;
+    border: 2px solid rgba(255,215,0,0.4);
+  }
+  .player-name { font-size: 13px; font-weight: 600; }
+  .player-bid { font-size: 11px; opacity: 0.7; margin-top: -2px; }
+  .bid-pill {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 10px;
+    background: rgba(255,215,0,0.15);
+    font-size: 11px;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+
+  /* Opponent hand backs */
+  .hand-back {
+    display: flex;
+    position: relative;
+  }
+  .hand-back.horizontal { flex-direction: row; }
+  .hand-back.vertical { flex-direction: column; }
+  .card-back {
+    width: 36px; height: 52px;
+    border-radius: 5px;
+    background:
+      linear-gradient(135deg, #8b1a1a 0%, #4a0a0a 100%);
+    border: 1px solid rgba(255,215,0,0.3);
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .card-back::after {
+    content: '';
+    position: absolute; inset: 3px;
+    border: 1px solid rgba(255,215,0,0.4);
+    border-radius: 3px;
+    background:
+      repeating-linear-gradient(45deg, transparent 0 4px, rgba(255,215,0,0.15) 4px 5px),
+      repeating-linear-gradient(-45deg, transparent 0 4px, rgba(255,215,0,0.15) 4px 5px);
+  }
+  .hand-back.horizontal .card-back:not(:first-child) { margin-right: -28px; }
+  .hand-back.vertical .card-back:not(:first-child) { margin-top: -42px; }
+
+  /* Center play area */
+  .center-area {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .play-zone {
+    position: relative;
+    width: 200px; height: 200px;
+  }
+  .played-card {
+    position: absolute;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .played-card.north { top: 0; left: 50%; transform: translateX(-50%) rotate(-2deg); }
+  .played-card.south { bottom: 0; left: 50%; transform: translateX(-50%) rotate(2deg); }
+  .played-card.east { right: 0; top: 50%; transform: translateY(-50%) rotate(3deg); }
+  .played-card.west { left: 0; top: 50%; transform: translateY(-50%) rotate(-3deg); }
+  .played-card.winner {
+    box-shadow: 0 0 30px rgba(255,215,0,0.8);
+    transform: translate(-50%,-50%) scale(1.15) !important;
+    z-index: 10;
+  }
+
+  /* ===== Cards ===== */
+  .card {
+    width: 64px; height: 92px;
+    border-radius: 7px;
+    background: linear-gradient(180deg, #fffef0, #f5e8c8);
+    border: 1px solid #c9b878;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    position: relative;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+  }
+  .card.played-card { width: 72px; height: 104px; }
+  .card .rank {
+    position: absolute;
+    font-family: 'Amiri', serif;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+  }
+  .card .rank.top { top: 4px; left: 4px; font-size: 14px; }
+  .card .rank.bot { bottom: 4px; right: 4px; font-size: 14px; transform: rotate(180deg); transform-origin: center; }
+  .card .suit-center {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    font-size: 30px;
+    line-height: 1;
+  }
+  .card.red { color: #c8102e; }
+  .card.black { color: #1a1a1a; }
+  .card.playable:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 8px 20px rgba(255,215,0,0.4);
+    z-index: 100;
+  }
+  .card.disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.5); }
+  .card.selected { transform: translateY(-18px); box-shadow: 0 10px 24px rgba(255,215,0,0.6); }
+
+  /* Player's hand */
+  .my-hand {
+    display: flex; justify-content: center; align-items: flex-end;
+    min-height: 110px;
+    padding-top: 30px;
+    flex-wrap: nowrap;
+  }
+  .my-hand .card:not(:first-child) { margin-right: -32px; }
+
+  /* ===== Modals / Overlays ===== */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+    animation: fadeIn 0.4s;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .panel {
+    background: linear-gradient(160deg, #1a3a25, #0d2515);
+    border: 2px solid rgba(255,215,0,0.3);
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 480px; width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+    text-align: center;
+    animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes slideUp { from { transform: translateY(40px) scale(0.95); opacity: 0; } to { transform: none; opacity: 1; } }
+
+  .title {
+    font-family: 'Amiri', serif;
+    font-size: 42px; font-weight: 700;
+    background: linear-gradient(180deg, #ffd700, #b8860b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 6px;
+  }
+  .subtitle { font-size: 14px; opacity: 0.7; margin-bottom: 20px; }
+
+  .btn {
+    padding: 12px 28px;
+    border-radius: 30px;
+    border: none;
+    font-family: 'Cairo';
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: linear-gradient(135deg, #ffd700, #b8860b);
+    color: #1a1a1a;
+    box-shadow: 0 4px 12px rgba(255,215,0,0.3);
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(255,215,0,0.5); }
+  .btn:active { transform: translateY(0); }
+  .btn.secondary {
+    background: linear-gradient(135deg, #4a4a4a, #2a2a2a);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .btn.danger { background: linear-gradient(135deg, #c8102e, #7a0a1a); color: #fff; }
+
+  .rules-text {
+    text-align: right;
+    font-size: 13px;
+    line-height: 1.8;
+    background: rgba(0,0,0,0.3);
+    padding: 14px;
+    border-radius: 10px;
+    margin: 12px 0;
+    max-height: 220px;
+    overflow-y: auto;
+  }
+  .rules-text h4 { color: #ffd700; margin-bottom: 4px; font-size: 14px; }
+  .rules-text ul { padding-right: 18px; }
+
+  /* Bid panel */
+  .bid-section { margin: 14px 0; }
+  .suit-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .suit-btn {
+    padding: 14px;
+    background: rgba(0,0,0,0.4);
+    border: 2px solid rgba(255,215,0,0.2);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: inherit;
+    font-size: 28px;
+  }
+  .suit-btn:hover { background: rgba(255,215,0,0.1); }
+  .suit-btn.selected {
+    border-color: #ffd700;
+    background: rgba(255,215,0,0.2);
+    box-shadow: 0 0 12px rgba(255,215,0,0.4);
+  }
+  .suit-btn.red { color: #ff6b6b; }
+  .suit-btn.black { color: #fff; }
+
+  .bid-row {
+    display: flex; justify-content: center; gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .bid-num {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.4);
+    border: 2px solid rgba(255,215,0,0.2);
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .bid-num:hover { background: rgba(255,215,0,0.15); }
+  .bid-num.selected {
+    background: linear-gradient(135deg, #ffd700, #b8860b);
+    color: #1a1a1a;
+    border-color: #ffd700;
+  }
+  .bid-num:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: linear-gradient(135deg, rgba(0,0,0,0.95), rgba(20,20,20,0.95));
+    border: 2px solid #ffd700;
+    color: #ffd700;
+    padding: 20px 40px;
+    border-radius: 12px;
+    font-family: 'Amiri';
+    font-size: 28px;
+    font-weight: 700;
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    text-align: center;
+    box-shadow: 0 0 40px rgba(255,215,0,0.4);
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .toast.small { font-size: 18px; padding: 12px 24px; }
+
+  /* Trick winner indicator */
+  .winner-badge {
+    position: absolute;
+    top: -8px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, #ffd700, #b8860b);
+    color: #1a1a1a;
+    font-size: 10px; font-weight: 900;
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+
+  /* Hand progress dots */
+  .tricks-progress {
+    display: flex; gap: 3px;
+    justify-content: center;
+    margin-top: 4px;
+  }
+  .trick-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+  }
+  .trick-dot.us { background: #7ec5ff; }
+  .trick-dot.them { background: #ff9090; }
+
+  @media (max-width: 640px) {
+    .title { font-size: 32px; }
+    .card { width: 48px; height: 70px; }
+    .card .rank.top, .card .rank.bot { font-size: 11px; }
+    .card .suit-center { font-size: 22px; }
+    .my-hand .card:not(:first-child) { margin-right: -28px; }
+    .card-back { width: 28px; height: 40px; }
+    .hand-back.horizontal .card-back:not(:first-child) { margin-right: -22px; }
+    .hand-back.vertical .card-back:not(:first-child) { margin-top: -32px; }
+    .play-zone { width: 160px; height: 160px; }
+    .card.played-card { width: 54px; height: 78px; }
+    .player-card { padding: 4px 10px; gap: 6px; }
+    .avatar { width: 28px; height: 28px; font-size: 13px; }
+    .player-name { font-size: 11px; }
+    .team-score { font-size: 18px; }
+    .team { padding: 2px 10px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="team us">
+      <div class="team-name">فريقنا (أنت + غرب)</div>
+      <div class="team-score" id="scoreUs">0</div>
+      <div class="tricks-progress" id="progressUs"></div>
+    </div>
+    <div class="game-info">
+      <div class="info-label" id="phaseLabel">الجولة</div>
+      <div class="info-value" id="roundInfo">1</div>
+      <div class="trump-display" id="trumpDisplay" style="display:none">
+        <span>الترامب:</span>
+        <span class="trump-icon" id="trumpIcon"></span>
+      </div>
+    </div>
+    <div class="team them">
+      <div class="team-name">فريقهم (شرق + شمال)</div>
+      <div class="team-score" id="scoreThem">0</div>
+      <div class="tricks-progress" id="progressThem"></div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table">
+    <div class="seat seat-north">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+        <div class="player-card" id="pc-north">
+          <div class="avatar">ش</div>
+          <div>
+            <div class="player-name">شمال</div>
+            <div class="player-bid" id="bid-north"></div>
+          </div>
+        </div>
+        <div class="hand-back horizontal" id="hand-north"></div>
+      </div>
+    </div>
+
+    <div class="seat seat-west">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+        <div class="player-card" id="pc-west">
+          <div class="avatar">غ</div>
+          <div>
+            <div class="player-name">غرب (شريك)</div>
+            <div class="player-bid" id="bid-west"></div>
+          </div>
+        </div>
+        <div class="hand-back vertical" id="hand-west"></div>
+      </div>
+    </div>
+
+    <div class="center">
+      <div class="center-area">
+        <div class="play-zone" id="playZone"></div>
+      </div>
+    </div>
+
+    <div class="seat seat-east">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+        <div class="player-card" id="pc-east">
+          <div class="avatar">ق</div>
+          <div>
+            <div class="player-name">شرق</div>
+            <div class="player-bid" id="bid-east"></div>
+          </div>
+        </div>
+        <div class="hand-back vertical" id="hand-east"></div>
+      </div>
+    </div>
+
+    <div class="seat seat-south">
+      <div class="player-card" id="pc-south" style="margin-bottom:6px;">
+        <div class="avatar">أ</div>
+        <div>
+          <div class="player-name">أنت</div>
+          <div class="player-bid" id="bid-south"></div>
+        </div>
+      </div>
+      <div class="my-hand" id="myHand"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Start Screen -->
+<div class="overlay" id="startScreen">
+  <div class="panel">
+    <div class="title">طرنيب</div>
+    <div class="subtitle">لعبة الورق العربية الكلاسيكية</div>
+    <div class="rules-text">
+      <h4>كيف تلعب:</h4>
+      <ul>
+        <li>٤ لاعبين في فريقين: أنت وغرب ضد شرق وشمال.</li>
+        <li>كل لاعب يحصل على ١٣ ورقة.</li>
+        <li><b>مرحلة المزايدة:</b> اختر نوع الورقة (الترامب) وعدد الطلعات التي تتعهد بأخذها (٧-١٣).</li>
+        <li>صاحب أعلى مزاد يحدد الترامب ويبدأ اللعب.</li>
+        <li><b>مرحلة اللعب:</b> يجب اتباع نوع الورقة الأولى، ومن لا يملكها يمكنه استخدام الترامب.</li>
+        <li>الترامب يهزم كل الأنواع الأخرى.</li>
+        <li>إذا أخذتَ طلعاتك أو أكثر = نقاط، وإلا تخسر نقاطاً.</li>
+        <li>أول فريق يصل إلى ٤١ نقطة يفوز باللعبة.</li>
+      </ul>
+    </div>
+    <button class="btn" onclick="startGame()">ابدأ اللعب</button>
+  </div>
+</div>
+
+<!-- Bid Screen -->
+<div class="overlay" id="bidScreen" style="display:none">
+  <div class="panel">
+    <div class="title" style="font-size:28px">المزايدة</div>
+    <div class="subtitle" id="bidSubtitle">اختر نوع الورقة وعدد الطلعات</div>
+    <div class="bid-section">
+      <div style="font-size:13px; margin-bottom:6px; opacity:0.8">نوع الورقة (الترامب):</div>
+      <div class="suit-grid" id="suitGrid">
+        <button class="suit-btn black" data-suit="♠">♠</button>
+        <button class="suit-btn red" data-suit="♥">♥</button>
+        <button class="suit-btn red" data-suit="♦">♦</button>
+        <button class="suit-btn black" data-suit="♣">♣</button>
+      </div>
+      <div style="font-size:13px; margin-bottom:6px; opacity:0.8">عدد الطلعات:</div>
+      <div class="bid-row" id="bidRow"></div>
+    </div>
+    <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
+      <button class="btn secondary" id="passBtn" onclick="submitBid(true)">تمرير</button>
+      <button class="btn" id="confirmBid" onclick="submitBid(false)" disabled>تأكيد</button>
+    </div>
+  </div>
+</div>
+
+<!-- Round End Screen -->
+<div class="overlay" id="roundEndScreen" style="display:none">
+  <div class="panel">
+    <div class="title" style="font-size:28px" id="roundEndTitle">انتهت الجولة</div>
+    <div id="roundEndDetails" style="margin: 14px 0; font-size:15px; line-height:1.9"></div>
+    <button class="btn" onclick="nextRound()">الجولة التالية</button>
+  </div>
+</div>
+
+<!-- Game Over Screen -->
+<div class="overlay" id="gameOverScreen" style="display:none">
+  <div class="panel">
+    <div class="title" id="gameOverTitle">انتهت اللعبة</div>
+    <div id="gameOverDetails" style="margin: 14px 0; font-size:16px"></div>
+    <button class="btn" onclick="restartGame()">لعب جديد</button>
+  </div>
+</div>
+
+<script>
+// ====================== Game State ======================
+const SUITS = ['♠','♥','♦','♣'];
+const SUIT_NAMES = {'♠':'سباتي','♥':'كبة','♦':'ديناري','♣':'كلوب'};
+const SUIT_COLORS = {'♠':'black','♥':'red','♦':'red','♣':'black'};
+const RANKS = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+const RANK_VALUE = {'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13,'A':14};
+const PLAYER_IDS = ['south','west','north','east']; // play order counter-clockwise
+const PLAYER_NAMES = {south:'أنت', west:'غرب', north:'شمال', east:'شرق'};
+const TEAM = {south:'us', west:'us', north:'them', east:'them'};
+
+const state = {
+  deck: [],
+  hands: {south:[], west:[], north:[], east:[]},
+  bids: {}, // playerId -> {suit, tricks, pass}
+  bidOrder: [],
+  bidIndex: 0,
+  highestBid: null, // {playerId, suit, tricks}
+  trumpSuit: null,
+  declarer: null,
+  currentTrick: [], // {playerId, card}
+  trickLeader: null,
+  tricksWon: {us:0, them:0},
+  scores: {us:0, them:0},
+  round: 1,
+  phase: 'idle', // 'bidding','playing','roundEnd','gameOver'
+  currentPlayer: null,
+  selectedSuit: null,
+  selectedBid: null,
+  soundOn: true,
+};
+
+// ====================== Audio ======================
+let audioCtx = null;
+function initAudio(){
+  if(!audioCtx){
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e){ state.soundOn = false; }
+  }
+}
+function beep(freq=440, dur=0.08, type='sine', vol=0.15){
+  if(!audioCtx || !state.soundOn) return;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = type; o.frequency.value = freq;
+  g.gain.setValueAtTime(vol, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start(); o.stop(audioCtx.currentTime + dur);
+}
+const SFX = {
+  card: ()=>{ beep(800,0.05,'sine',0.1); beep(600,0.06,'sine',0.08); },
+  win: ()=>{ beep(523,0.1,'sine',0.15); setTimeout(()=>beep(659,0.1,'sine',0.15),80); setTimeout(()=>beep(784,0.18,'sine',0.15),160); },
+  lose: ()=>{ beep(330,0.15,'sawtooth',0.1); setTimeout(()=>beep(220,0.25,'sawtooth',0.1),120); },
+  bid: ()=>{ beep(440,0.08,'triangle',0.12); setTimeout(()=>beep(660,0.1,'triangle',0.12),60); },
+  click: ()=>{ beep(700,0.04,'square',0.06); },
+  roundEnd: ()=>{ beep(523,0.15); setTimeout(()=>beep(659,0.15),120); setTimeout(()=>beep(784,0.15),240); setTimeout(()=>beep(1047,0.3),360); }
+};
+
+// ====================== Deck & Deal ======================
+function buildDeck(){
+  const d = [];
+  for(const s of SUITS) for(const r of RANKS) d.push({suit:s, rank:r, value:RANK_VALUE[r], color:SUIT_COLORS[s]});
+  return d;
+}
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function deal(){
+  state.deck = shuffle(buildDeck());
+  state.hands = {south:[], west:[], north:[], east:[]};
+  for(let i=0;i<52;i++){
+    state.hands[PLAYER_IDS[i%4]].push(state.deck[i]);
+  }
+  // sort hands by suit then rank desc
+  for(const p of PLAYER_IDS){
+    state.hands[p].sort((a,b)=>{
+      const sa = SUITS.indexOf(a.suit), sb = SUITS.indexOf(b.suit);
+      if(sa!==sb) return sa-sb;
+      return b.value - a.value;
+    });
+  }
+}
+
+// ====================== Rendering ======================
+function suitColorClass(suit){ return SUIT_COLORS[suit]==='red'?'red':'black'; }
+
+function cardHTML(card, opts={}){
+  const cls = ['card', suitColorClass(card.suit)];
+  if(opts.playable) cls.push('playable');
+  if(opts.disabled) cls.push('disabled');
+  if(opts.extra) cls.push(opts.extra);
+  return `<div class="${cls.join(' ')}" data-suit="${card.suit}" data-rank="${card.rank}" ${opts.onclick?`onclick="${opts.onclick}"`:''}>
+    <div class="rank top">${card.rank}<br><span style="font-size:12px">${card.suit}</span></div>
+    <div class="suit-center">${card.suit}</div>
+    <div class="rank bot">${card.rank}<br><span style="font-size:12px">${card.suit}</span></div>
+  </div>`;
+}
+
+function renderHands(){
+  // Player's hand
+  const me = document.getElementById('myHand');
+  me.innerHTML = '';
+  const myHand = state.hands.south;
+  const playable = getPlayableCards('south');
+  myHand.forEach(card=>{
+    const isPlayable = playable.some(c=>c.suit===card.suit && c.rank===card.rank);
+    const opts = state.phase==='playing' && state.currentPlayer==='south'
+      ? {playable: isPlayable, disabled: !isPlayable, onclick: `playCard('south','${card.suit}','${card.rank}')`}
+      : {disabled: true};
+    me.insertAdjacentHTML('beforeend', cardHTML(card, opts));
+  });
+
+  // Opponent backs
+  for(const p of ['north','east','west']){
+    const el = document.getElementById('hand-'+p);
+    const n = state.hands[p].length;
+    el.innerHTML = '';
+    const max = Math.min(n, p==='north'?13:13);
+    for(let i=0;i<max;i++){
+      el.insertAdjacentHTML('beforeend', '<div class="card-back"></div>');
+    }
+  }
+}
+
+function renderBids(){
+  for(const p of PLAYER_IDS){
+    const el = document.getElementById('bid-'+p);
+    const b = state.bids[p];
+    if(!b){ el.innerHTML=''; continue; }
+    if(b.pass){ el.innerHTML = '<span class="bid-pill" style="background:rgba(255,120,120,0.2)">تمرير</span>'; }
+    else { el.innerHTML = `<span class="bid-pill">${b.suit} ${b.tricks}</span>`; }
+  }
+}
+
+function renderActivePlayer(){
+  for(const p of PLAYER_IDS){
+    document.getElementById('pc-'+p).classList.toggle('active', state.currentPlayer===p);
+  }
+}
+
+function renderScores(){
+  document.getElementById('scoreUs').textContent = state.scores.us;
+  document.getElementById('scoreThem').textContent = state.scores.them;
+  // progress dots
+  const pu = document.getElementById('progressUs');
+  const pt = document.getElementById('progressThem');
+  pu.innerHTML=''; pt.innerHTML='';
+  for(let i=0;i<13;i++){
+    const du = document.createElement('div'); du.className='trick-dot'+(i<state.tricksWon.us?' us':'');
+    const dt = document.createElement('div'); dt.className='trick-dot'+(i<state.tricksWon.them?' them':'');
+    pu.appendChild(du); pt.appendChild(dt);
+  }
+  document.getElementById('roundInfo').textContent = state.round;
+  const td = document.getElementById('trumpDisplay');
+  if(state.trumpSuit){
+    td.style.display='inline-flex';
+    const icon = document.getElementById('trumpIcon');
+    icon.textContent = state.trumpSuit;
+    icon.style.color = SUIT_COLORS[state.trumpSuit]==='red'?'#ff6b6b':'#ffd700';
+  } else { td.style.display='none'; }
+}
+
+function renderPlayZone(){
+  const pz = document.getElementById('playZone');
+  pz.innerHTML = '';
+  for(const play of state.currentTrick){
+    const pos = play.playerId;
+    const card = play.card;
+    const html = cardHTML(card, {extra: `played-card ${pos}`});
+    pz.insertAdjacentHTML('beforeend', html);
+  }
+}
+
+function renderAll(){
+  renderHands();
+  renderBids();
+  renderActivePlayer();
+  renderScores();
+  renderPlayZone();
+}
+
+// ====================== Bidding ======================
+function startBidding(){
+  state.phase = 'bidding';
+  state.bids = {};
+  state.bidOrder = [...PLAYER_IDS];
+  state.bidIndex = 0;
+  state.highestBid = null;
+  // Random first bidder each round, but typically winner of previous trick leads. We'll start with south for round 1, then rotate.
+  state.bidOrder = [...PLAYER_IDS];
+  // Rotate so that a different player starts each round
+  const startIdx = (state.round - 1) % 4;
+  state.bidOrder = [...PLAYER_IDS.slice(startIdx), ...PLAYER_IDS.slice(0, startIdx)];
+  state.bidIndex = 0;
+  document.getElementById('phaseLabel').textContent = 'المزايدة';
+  nextBidder();
+}
+
+function nextBidder(){
+  if(state.bidIndex >= 4){
+    finalizeBidding();
+    return;
+  }
+  const player = state.bidOrder[state.bidIndex];
+  state.currentPlayer = player;
+  renderActivePlayer();
+
+  if(player === 'south'){
+    showBidScreen();
+  } else {
+    setTimeout(()=> aiBid(player), 700);
+  }
+}
+
+function showBidScreen(){
+  // Determine minimum bid
+  const minBid = state.highestBid ? state.highestBid.tricks + 1 : 7;
+  const subtitle = document.getElementById('bidSubtitle');
+  if(state.highestBid){
+    subtitle.innerHTML = `أعلى مزاد حالي: <b>${state.highestBid.suit} ${state.highestBid.tricks}</b> من ${PLAYER_NAMES[state.highestBid.playerId]}`;
+  } else {
+    subtitle.textContent = 'اختر نوع الورقة وعدد الطلعات (٧-١٣)';
+  }
+
+  // Bid numbers
+  const row = document.getElementById('bidRow');
+  row.innerHTML = '';
+  for(let i=7;i<=13;i++){
+    const btn = document.createElement('button');
+    btn.className = 'bid-num';
+    btn.textContent = i;
+    btn.dataset.val = i;
+    if(i < minBid) btn.disabled = true;
+    btn.onclick = ()=>{
+      if(btn.disabled) return;
+      document.querySelectorAll('#bidRow .bid-num').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      state.selectedBid = i;
+      updateConfirmBtn();
+      SFX.click();
+    };
+    row.appendChild(btn);
+  }
+
+  // Suit buttons
+  document.querySelectorAll('#suitGrid .suit-btn').forEach(b=>{
+    b.classList.toggle('selected', state.selectedSuit===b.dataset.suit);
+    b.onclick = ()=>{
+      document.querySelectorAll('#suitGrid .suit-btn').forEach(x=>x.classList.remove('selected'));
+      b.classList.add('selected');
+      state.selectedSuit = b.dataset.suit;
+      updateConfirmBtn();
+      SFX.click();
+    };
+  });
+
+  // Pass button - always available
+  document.getElementById('passBtn').style.display = '';
+  state.selectedSuit = null;
+  state.selectedBid = null;
+  updateConfirmBtn();
+  document.getElementById('bidScreen').style.display = 'flex';
+}
+
+function updateConfirmBtn(){
+  const btn = document.getElementById('confirmBid');
+  btn.disabled = !(state.selectedSuit && state.selectedBid);
+}
+
+function submitBid(pass){
+  document.getElementById('bidScreen').style.display = 'none';
+  if(pass){
+    state.bids.south = {pass:true};
+    showToast('تمرير', 'small');
+  } else {
+    state.bids.south = {suit: state.selectedSuit, tricks: state.selectedBid, pass:false};
+    if(!state.highestBid || state.selectedBid > state.highestBid.tricks){
+      state.highestBid = {playerId:'south', suit:state.selectedSuit, tricks:state.selectedBid};
+    }
+    SFX.bid();
+    showToast(`${state.selectedSuit} ${state.selectedBid}`, 'small');
+  }
+  state.bidIndex++;
+  setTimeout(nextBidder, 600);
+}
+
+function aiBid(player){
+  const hand = state.hands[player];
+  // Estimate strength: count high cards per suit, and overall
+  const suitCount = {'♠':0,'♥':0,'♦':0,'♣':0};
+  const suitStrength = {'♠':0,'♥':0,'♦':0,'♣':0};
+  for(const c of hand){
+    suitCount[c.suit]++;
+    if(c.value>=10) suitStrength[c.suit] += c.value - 9; // J=2,Q=3,K=4,A=5
+    if(c.value>=12) suitStrength[c.suit] += 2; // bonus for K,A
+  }
+  // Pick best suit (most cards + strength)
+  let bestSuit='♠', bestScore=-1;
+  for(const s of SUITS){
+    const sc = suitCount[s]*1.5 + suitStrength[s];
+    if(sc>bestScore){ bestScore=sc; bestSuit=s; }
+  }
+  // Estimate expected tricks: high cards in best suit + aces/king in others
+  let expected = 0;
+  for(const c of hand){
+    if(c.suit===bestSuit && c.value>=12) expected += 1;
+    else if(c.suit===bestSuit && c.value>=10) expected += 0.5;
+    else if(c.value===14) expected += 0.7;
+    else if(c.value===13) expected += 0.3;
+  }
+  expected = Math.round(expected + suitCount[bestSuit]*0.2);
+
+  // Partner consideration (simplified): partner might have already bid
+  const partnerBid = Object.entries(state.bids).find(([p,b])=>!b.pass && TEAM[p]===TEAM[player] && p!==player);
+  if(partnerBid) expected += 1;
+
+  // Decide bid
+  const minBid = state.highestBid ? state.highestBid.tricks + 1 : 7;
+  const willBid = expected >= minBid && expected >= 7 && Math.random() > 0.15;
+
+  if(willBid && minBid <= 13){
+    const bidTricks = Math.min(13, Math.max(minBid, expected));
+    state.bids[player] = {suit: bestSuit, tricks: bidTricks, pass:false};
+    if(!state.highestBid || bidTricks > state.highestBid.tricks){
+      state.highestBid = {playerId: player, suit: bestSuit, tricks: bidTricks};
+    }
+    showToast(`${PLAYER_NAMES[player]}: ${bestSuit} ${bidTricks}`, 'small');
+    SFX.bid();
+  } else {
+    state.bids[player] = {pass:true};
+    showToast(`${PLAYER_NAMES[player]}: تمرير`, 'small');
+  }
+  renderBids();
+  state.bidIndex++;
+  setTimeout(nextBidder, 900);
+}
+
+function finalizeBidding(){
+  if(!state.highestBid){
+    // All passed - force minimum bid on first bidder
+    const player = state.bidOrder[0];
+    const hand = state.hands[player];
+    let bestSuit='♠', bestCount=-1;
+    for(const s of SUITS){
+      const cnt = hand.filter(c=>c.suit===s).length;
+      if(cnt>bestCount){ bestCount=cnt; bestSuit=s; }
+    }
+    state.highestBid = {playerId:player, suit:bestSuit, tricks:7};
+    state.bids[player] = {suit:bestSuit, tricks:7, pass:false};
+  }
+  state.trumpSuit = state.highestBid.suit;
+  state.declarer = state.highestBid.playerId;
+  state.trickLeader = state.declarer;
+  state.currentPlayer = state.declarer;
+  document.getElementById('phaseLabel').textContent = 'اللعب';
+  showToast(`الترامب: ${state.trumpSuit}\nالمعلن: ${PLAYER_NAMES[state.declarer]}`);
+  renderAll();
+  setTimeout(()=> startTrick(), 1200);
+}
+
+// ====================== Playing ======================
+function getPlayableCards(player){
+  const hand = state.hands[player];
+  if(state.currentTrick.length===0) return [...hand];
+  const leadSuit = state.currentTrick[0].card.suit;
+  const sameSuit = hand.filter(c=>c.suit===leadSuit);
+  if(sameSuit.length>0) return sameSuit;
+  return [...hand];
+}
+
+function startTrick(){
+  state.currentTrick = [];
+  state.currentPlayer = state.trickLeader;
+  renderAll();
+  if(state.currentPlayer === 'south'){
+    // Wait for player input
+  } else {
+    setTimeout(()=> aiPlay(state.currentPlayer), 900);
+  }
+}
+
+function playCard(player, suit, rank){
+  if(state.phase !== 'playing') return;
+  if(state.currentPlayer !== player) return;
+  const card = state.hands[player].find(c=>c.suit===suit && c.rank===rank);
+  if(!card) return;
+  const playable = getPlayableCards(player);
+  if(!playable.some(c=>c.suit===suit && c.rank===rank)) return;
+
+  // Remove from hand
+  state.hands[player] = state.hands[player].filter(c=>!(c.suit===suit && c.rank===rank));
+  state.currentTrick.push({playerId: player, card});
+  SFX.card();
+  renderAll();
+
+  if(state.currentTrick.length === 4){
+    setTimeout(resolveTrick, 1000);
+  } else {
+    // Next player counter-clockwise: after south -> west -> north -> east -> south
+    const order = ['south','west','north','east'];
+    const idx = order.indexOf(player);
+    state.currentPlayer = order[(idx+1)%4];
+    renderActivePlayer();
+    if(state.currentPlayer !== 'south'){
+      setTimeout(()=> aiPlay(state.currentPlayer), 800);
+    }
+  }
+}
+
+function aiPlay(player){
+  const playable = getPlayableCards(player);
+  if(playable.length===0) return;
+  const card = chooseAICard(player, playable);
+  playCard(player, card.suit, card.rank);
+}
+
+function chooseAICard(player, playable){
+  const trick = state.currentTrick;
+  const trump = state.trumpSuit;
+  const partner = getPartner(player);
+
+  if(trick.length === 0){
+    // Leading: play a strong non-trump if possible, or longest suit
+    const nonTrump = playable.filter(c=>c.suit!==trump);
+    if(nonTrump.length > 0){
+      // Play highest in longest non-trump suit
+      const bySuit = {};
+      for(const c of nonTrump){ bySuit[c.suit] = bySuit[c.suit]||[]; bySuit[c.suit].push(c); }
+      let best = null, bestLen = 0;
+      for(const s in bySuit){ if(bySuit[s].length > bestLen || (bySuit[s].length===bestLen && best && bySuit[s][0].value > best.value)){ bestLen = bySuit[s].length; best = bySuit[s][0]; } }
+      // Actually prefer playing ace if have it
+      const aces = nonTrump.filter(c=>c.value===14);
+      if(aces.length>0) return aces[0];
+      return best || nonTrump[0];
+    }
+    // Only trump left - play lowest
+    return playable.sort((a,b)=>a.value-b.value)[0];
+  }
+
+  // Following
+  const leadSuit = trick[0].card.suit;
+  const sameSuit = playable.filter(c=>c.suit===leadSuit);
+  const currentWinner = getTrickWinner(trick, trump);
+  const partnerWinning = currentWinner && TEAM[currentWinner.playerId] === TEAM[player];
+
+  if(sameSuit.length > 0){
+    // Must follow suit
+    if(partnerWinning){
+      // Play lowest
+      return sameSuit.sort((a,b)=>a.value-b.value)[0];
+    } else {
+      // Try to win with lowest winning card
+      const winningCards = sameSuit.filter(c => c.value > currentWinner.card.value && (currentWinner.card.suit !== trump || c.suit === trump));
+      // Actually if current winner is trump and we're following lead suit (not trump), we can't beat trump with non-trump
+      if(currentWinner.card.suit === trump && leadSuit !== trump){
+        // Can't beat trump, play lowest
+        return sameSuit.sort((a,b)=>a.value-b.value)[0];
+      }
+      if(winningCards.length > 0){
+        return winningCards.sort((a,b)=>a.value-b.value)[0];
+      }
+      return sameSuit.sort((a,b)=>a.value-b.value)[0];
+    }
+  } else {
+    // Can't follow suit - can play trump or any
+    const trumps = playable.filter(c=>c.suit===trump);
+    if(trumps.length > 0 && !partnerWinning){
+      // Try to win with trump
+      if(currentWinner.card.suit === trump){
+        // Need higher trump
+        const higher = trumps.filter(c=>c.value > currentWinner.card.value);
+        if(higher.length>0) return higher.sort((a,b)=>a.value-b.value)[0];
+        // Can't beat, dump lowest non-trump
+        const nonTrump = playable.filter(c=>c.suit!==trump);
+        if(nonTrump.length>0) return nonTrump.sort((a,b)=>a.value-b.value)[0];
+        return trumps.sort((a,b)=>a.value-b.value)[0];
+      } else {
+        // Beat non-trump with lowest trump
+        return trumps.sort((a,b)=>a.value-b.value)[0];
+      }
+    } else {
+      // Dump lowest card
+      return playable.sort((a,b)=>a.value-b.value)[0];
+    }
+  }
+}
+
+function getPartner(p){
+  const map = {south:'west', west:'south', north:'east', east:'north'};
+  return map[p];
+}
+
+function getTrickWinner(trick, trump){
+  if(trick.length===0) return null;
+  const leadSuit = trick[0].card.suit;
+  let winner = trick[0];
+  for(let i=1;i<trick.length;i++){
+    const c = trick[i].card;
+    const w = winner.card;
+    // Trump beats non-trump
+    if(c.suit === trump && w.suit !== trump) winner = trick[i];
+    else if(c.suit !== trump && w.suit === trump) continue;
+    else if(c.suit === w.suit && c.value > w.value) winner = trick[i];
+    else if(c.suit === trump && w.suit === trump && c.value > w.value) winner = trick[i];
+    else if(c.suit === leadSuit && w.suit !== leadSuit && w.suit !== trump) winner = trick[i];
+  }
+  return winner;
+}
+
+function resolveTrick(){
+  const winner = getTrickWinner(state.currentTrick, state.trumpSuit);
+  const team = TEAM[winner.playerId];
+  state.tricksWon[team]++;
+  state.trickLeader = winner.playerId;
+
+  // Highlight winning card
+  const pz = document.getElementById('playZone');
+  const cards = pz.querySelectorAll('.card');
+  const winIdx = state.currentTrick.findIndex(t=>t.playerId===winner.playerId);
+  if(cards[winIdx]) cards[winIdx].classList.add('winner');
+
+  SFX.win();
+  showToast(`${PLAYER_NAMES[winner.playerId]} أخذ الطلعة!`, 'small');
+
+  renderScores();
+
+  setTimeout(()=>{
+    state.currentTrick = [];
+    renderPlayZone();
+    // Check if round over
+    if(state.hands.south.length === 0){
+      endRound();
+    } else {
+      startTrick();
+    }
+  }, 1400);
+}
+
+// ====================== Scoring ======================
+function endRound(){
+  state.phase = 'roundEnd';
+  const declarerTeam = TEAM[state.declarer];
+  const bid = state.highestBid.tricks;
+  const won = state.tricksWon[declarerTeam];
+
+  let pointsUs = 0, pointsThem = 0;
+  let detail = '';
+
+  if(won >= bid){
+    // Made bid
+    const basePoints = bid >= 10 ? bid * 2 : bid; // double points for 10+
+    const extra = (won - bid);
+    const total = basePoints + extra;
+    if(declarerTeam === 'us'){
+      pointsUs = total;
+      pointsThem = state.tricksWon.them;
+    } else {
+      pointsThem = total;
+      pointsUs = state.tricksWon.us;
+    }
+    detail = `فريق ${declarerTeam==='us'?'أنتم':'هم'} نجح في المزايد (${bid}) وأخذ ${won} طلعة!<br>حصل على ${total} نقطة.`;
+    SFX.roundEnd();
+  } else {
+    // Failed bid
+    const penalty = bid;
+    if(declarerTeam === 'us'){
+      pointsUs = -penalty;
+      pointsThem = state.tricksWon.them;
+    } else {
+      pointsThem = -penalty;
+      pointsUs = state.tricksWon.us;
+    }
+    detail = `فريق ${declarerTeam==='us'?'أنتم':'هم'} فشل في المزايد (${bid}) وأخذ ${won} طلعة فقط.<br>خسر ${penalty} نقطة!`;
+    SFX.lose();
+  }
+
+  state.scores.us = Math.max(0, state.scores.us + pointsUs);
+  state.scores.them = Math.max(0, state.scores.them + pointsThem);
+
+  document.getElementById('roundEndTitle').textContent = 'انتهت الجولة '+state.round;
+  document.getElementById('roundEndDetails').innerHTML = `
+    <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:10px; margin-bottom:10px">${detail}</div>
+    <div style="display:flex; justify-content:space-around; margin: 10px 0">
+      <div><div style="font-size:11px;opacity:0.7">فريقنا</div><div style="font-size:24px;font-weight:900;color:#7ec5ff">${state.scores.us}</div></div>
+      <div><div style="font-size:11px;opacity:0.7">فريقهم</div><div style="font-size:24px;font-weight:900;color:#ff9090">${state.scores.them}</div></div>
+    </div>
+  `;
+  renderScores();
+  document.getElementById('roundEndScreen').style.display = 'flex';
+
+  // Check game over
+  if(state.scores.us >= 41 || state.scores.them >= 41){
+    setTimeout(()=>{
+      document.getElementById('roundEndScreen').style.display = 'none';
+      showGameOver();
+    }, 100);
+  }
+}
+
+function nextRound(){
+  document.getElementById('roundEndScreen').style.display = 'none';
+  state.round++;
+  state.tricksWon = {us:0, them:0};
+  state.trumpSuit = null;
+  state.declarer = null;
+  state.highestBid = null;
+  state.bids = {};
+  state.currentTrick = [];
+  deal();
+  renderAll();
+  setTimeout(startBidding, 400);
+}
+
+function showGameOver(){
+  state.phase = 'gameOver';
+  const usWin = state.scores.us >= 41;
+  document.getElementById('gameOverTitle').textContent = usWin ? 'فزتم!' : 'خسرتم';
+  document.getElementById('gameOverDetails').innerHTML = `
+    <div style="font-size:18px; margin-bottom:10px">${usWin ? '🎉 مبروك! وصلتم إلى ٤١ نقطة' : 'وصل فريقهم إلى ٤١ نقطة أولاً'}</div>
+    <div style="display:flex; justify-content:space-around">
+      <div><div style="font-size:11px;opacity:0.7">فريقنا</div><div style="font-size:30px;font-weight:900;color:#7ec5ff">${state.scores.us}</div></div>
+      <div><div style="font-size:11px;opacity:0.7">فريقهم</div><div style="font-size:30px;font-weight:900;color:#ff9090">${state.scores.them}</div></div>
+    </div>
+  `;
+  if(usWin) SFX.win(); else SFX.lose();
+  document.getElementById('gameOverScreen').style.display = 'flex';
+}
+
+// ====================== Toast ======================
+let toastTimer = null;
+function showToast(msg, size=''){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + size;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ t.className = 'toast ' + size; }, 1400);
+}
+
+// ====================== Game Flow ======================
+function startGame(){
+  initAudio();
+  document.getElementById('startScreen').style.display = 'none';
+  state.scores = {us:0, them:0};
+  state.round = 1;
+  state.tricksWon = {us:0, them:0};
+  deal();
+  renderAll();
+  setTimeout(startBidding, 300);
+}
+
+function restartGame(){
+  document.getElementById('gameOverScreen').style.display = 'none';
+  startGame();
+}
+
+// Make functions global
+window.startGame = startGame;
+window.restartGame = restartGame;
+window.submitBid = submitBid;
+window.nextRound = nextRound;
+window.playCard = playCard;
+
+// Initial render
+renderAll();
+</script>
+</body>
+</html>
